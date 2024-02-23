@@ -95,21 +95,21 @@ def addSongsToPlaylist(endpointURL, authHeaders, songTitle):
 
 def convertedSongNamesWithArtists(songName, artistName):
     #adds space between the song names
-    songName = songName.replace(" ", "%20")
-    songName = songName.replace("(", "%28")
-    songName = songName.replace(")", "%29")
-    songName = songName.replace("!", "%21")
-    songName = songName.replace("+", "%2B")
-    songName = songName.replace("-", "%2D")
-    songName = songName.replace("'", "%27")
-    artistName = artistName.replace(" ", "%20")
-    artistName = artistName.replace("(", "%28")
-    artistName = artistName.replace(")", "%29")
-    artistName = artistName.replace("!", "%21")
-    artistName = artistName.replace("+", "%2B")
-    artistName = artistName.replace("-", "%2D")
-    artistName = artistName.replace("'", "%27")
-    retQuery = "track%3A" + songName + "artist%3A" + artistName
+    songName = songName.replace(" ", "%2520")
+    songName = songName.replace("(", "%2528")
+    songName = songName.replace(")", "%2529")
+    songName = songName.replace("!", "%2521")
+    songName = songName.replace("+", "%252B")
+    songName = songName.replace("-", "%252D")
+    songName = songName.replace("'", "%2527")
+    artistName = artistName.replace(" ", "%2520")
+    artistName = artistName.replace("(", "%2528")
+    artistName = artistName.replace(")", "%2529")
+    artistName = artistName.replace("!", "%2521")
+    artistName = artistName.replace("+", "%252B")
+    artistName = artistName.replace("-", "%252D")
+    artistName = artistName.replace("'", "%2527")
+    retQuery = "track%253A" + songName + "artist%253A" + artistName
     return retQuery
 
 def convertArrayToJson(songArray):
