@@ -58,6 +58,7 @@ def searchAndReturnSongIds(endpointURL, authHeader, songNames):
         songName = songNames[i]
         artistName = songNames[i + 1]
         songArtistQuery = convertedSongNamesWithArtists(songName, artistName)
+        songArtistQuery += "&type=track&market=US"
         convertedSongNames.append(songArtistQuery)
         i += 1
     # TODO: change this URL
@@ -65,20 +66,49 @@ def searchAndReturnSongIds(endpointURL, authHeader, songNames):
     for i in range(1, len(convertedSongNames)):
         newEndpointURL = endpointURL + "/search?q=" + convertedSongNames[i]
         print(newEndpointURL)
-        #TODO: figure out how to wait for the response to return on this URL
         response = requests.get(newEndpointURL, headers={"Authorization": authHeader})
         time.sleep(1)
         if response.status_code != 200:
             error = "didn't get a successful response please check the request"
-            return error
+            print(error)
+            continue
+        print(response.json())
+        #tracks = response.json()["tracks"]
+        #id = extractSongIdFromSearch(tracks)
+        #TODO: add the song here!
 
-        print(response)
-
+def extractSongIdFromSearch(responseJson):
+    print(responseJson)
+    tracks = responseJson["items"]
+    if tracks.length > 0:
+        track = tracks[0]
+        id = track["id"]
+        return id
+    else:
+        print("No songs available, getting next song")
+def addSongsToPlaylist(endpointURL, authHeaders, songTitle):
+    # get the song and add it to playlist
+    newEndpointURL = endpointURL + "" #TODO: figure out what this error is here
+    print(newEndpointURL)
+    # response = requests.post(newEndpointURL, headers={"Authorization": authHeader})
+    return
 
 def convertedSongNamesWithArtists(songName, artistName):
     #adds space between the song names
     songName = songName.replace(" ", "%20")
+    songName = songName.replace("(", "%28")
+    songName = songName.replace(")", "%29")
+    songName = songName.replace("!", "%21")
+    songName = songName.replace("+", "%2B")
+    songName = songName.replace("-", "%2D")
+    songName = songName.replace("'", "%27")
     artistName = artistName.replace(" ", "%20")
+    artistName = artistName.replace("(", "%28")
+    artistName = artistName.replace(")", "%29")
+    artistName = artistName.replace("!", "%21")
+    artistName = artistName.replace("+", "%2B")
+    artistName = artistName.replace("-", "%2D")
+    artistName = artistName.replace("'", "%27")
     retQuery = "track%3A" + songName + "artist%3A" + artistName
     return retQuery
 
