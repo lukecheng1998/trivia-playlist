@@ -23,6 +23,7 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     # method to get the ID of the playlist
     # TODO: return errors properly rather than from methods
     newEndpointURL = endpointURL + "/users/" + id + "/playlists"
+    print(newEndpointURL)
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader})
     if response.status_code != 200:
         error = "Could not get successful response for getting playlist"
@@ -31,7 +32,7 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     # iterate through the playlist body to find the Trivia playlist
     for playlist in playlists:
         if playlist["name"] == triviaPlaylist:
-            print(playlist)
+            print(playlist["id"])
             return playlist["id"]
     error = "Playlist does not exist, please create the playlist"
     return error
@@ -44,10 +45,14 @@ def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames):
     if len(tracks["items"]) > 0:
         # delete the tracks and reset
         print(len(tracks["items"].length))
-    else:
-        # search for song ids here
-        searchAndReturnSongIds(endpointURL, authHeader, songNames)
-        print("Successfully added stuff to playlists")
+    # search for song ids here
+    searchedSongIds = searchAndReturnSongIds(endpointURL, authHeader, songNames)
+    #TODO: add songs here AND continue from here Luke C.
+    adjustedSongs = adjustSongURLAndGetList(searchedSongIds)
+    print(adjustedSongs)
+    newEndpointURL = endpointURL + "/playlists/" + playlistId + "/tracks"
+    #TODO: create a query here
+    print("Successfully added stuff to playlists")
     return response
 
 def searchAndReturnSongIds(endpointURL, authHeader, songNames):
@@ -62,39 +67,44 @@ def searchAndReturnSongIds(endpointURL, authHeader, songNames):
         convertedSongNames.append(songArtistQuery)
         i += 1
     # TODO: change this URL
-    print(convertedSongNames)
+    print("extracted songs")
+    arrayOfSongIds = []
     for i in range(1, len(convertedSongNames)):
         newEndpointURL = endpointURL + "/search?q=" + convertedSongNames[i]
-        print(newEndpointURL)
         response = requests.get(newEndpointURL, headers={"Authorization": authHeader})
         time.sleep(1)
         if response.status_code != 200:
             error = "didn't get a successful response please check the request"
             print(error)
             continue
-        print(response.json())
-        #tracks = response.json()["tracks"]
-        #id = extractSongIdFromSearch(tracks)
-        #TODO: add the song here!
+        #print(response.json())
+        # TODO: add the song here!
+        result = extractSongIdFromSearch(response)
+        if result != -1:
+            arrayOfSongIds.append(result)
+    return arrayOfSongIds
 
 def extractSongIdFromSearch(responseJson):
-    print(responseJson)
-    tracks = responseJson["items"]
-    if tracks.length > 0:
-        track = tracks[0]
-        id = track["id"]
-        return id
-    else:
-        print("No songs available, getting next song")
-def addSongsToPlaylist(endpointURL, authHeaders, songTitle):
+    # gets the song ID which is what we need to insert it into our playlist
+    tracks = responseJson.json()["tracks"]
+    items = tracks["items"]
+    if len(items) < 1:
+        return -1
+    album = items[0]
+    songId = album["id"]
+    return songId
+def adjustSongURLAndGetList (songIDs):
     # get the song and add it to playlist
-    newEndpointURL = endpointURL + "" #TODO: figure out what this error is here
-    print(newEndpointURL)
+    #TODO: This is the proper link https://developer.spotify.com/documentation/web-api/reference/add-tracks-to-playlist
+    urlSongs = []
+    for song in songIDs:
+        urlSong = "spotify:track:" + song
+        urlSongs.append(urlSong)
     # response = requests.post(newEndpointURL, headers={"Authorization": authHeader})
-    return
+    return urlSongs
 
 def convertedSongNamesWithArtists(songName, artistName):
-    #adds space between the song names
+    #makes song names and artist name much more compatible with a URL request
     songName = songName.replace(" ", "%2520")
     songName = songName.replace("(", "%2528")
     songName = songName.replace(")", "%2529")
