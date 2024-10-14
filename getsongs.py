@@ -12,12 +12,16 @@ def beginProcess(url):
     print(songArray)
     return songArray
 
-def getTokenFromSpotify(authURL, clientId, clientSecrets, grantType, contentType):
+def getTokenFromSpotifyNew(authURL, clientId, client_secret, code, content_type_2, content_type, scope):
+    tokenResponse = requests.post(authURL, headers={"Content-Type": content_type_2, "Authorization": code})
+
+def getTokenFromSpotify(authURL, clientId, clientSecrets, grantType, contentType, scope):
     # make a request here, obtains the auth token that is needed to execute commands in the spotify env
-    tokenResponse = requests.post(authURL, headers= {"Content-Type": contentType}, data={"grant_type": grantType, "client_id": clientId, "client_secret": clientSecrets}).json()
+    tokenResponse = requests.post(authURL, headers= {"Content-Type": contentType}, data={"grant_type": grantType, "client_id": clientId, "client_secret": clientSecrets, "scope": scope}).json()
     token = tokenResponse["access_token"]
     token_type = tokenResponse["token_type"]
-    retToken = token_type + " " + token
+    # retToken = token_type + " " + token
+    retToken = token
     return retToken
 def getPlaylistFromId(endpointURL, id, authHeader):
     # method to get the ID of the playlist
@@ -26,7 +30,7 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     print(newEndpointURL)
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader})
     if response.status_code != 200:
-        error = "Could not get successful response for getting playlist"
+        error = "Could not get successful response for getting playlist, here is the error"
         return error
     playlists = response.json()["items"]
     # iterate through the playlist body to find the Trivia playlist
@@ -37,21 +41,35 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     error = "Playlist does not exist, please create the playlist"
     return error
 
-def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames):
+def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authCodeHeader):
     # after getting the playlist we need to see if the playlist needs to be changed or if songs need to be added to it
     newEndpointURL = endpointURL + "/playlists/" + playlistId
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader}).json()
     tracks = response["tracks"]
     if len(tracks["items"]) > 0:
         # delete the tracks and reset
-        print(len(tracks["items"].length))
+        print("To be deleted")
     # search for song ids here
     searchedSongIds = searchAndReturnSongIds(endpointURL, authHeader, songNames)
     #TODO: add songs here AND continue from here Luke C.
     adjustedSongs = adjustSongURLAndGetList(searchedSongIds)
     print(adjustedSongs)
     newEndpointURL = endpointURL + "/playlists/" + playlistId + "/tracks"
+    print("New Endpoint URL: " + newEndpointURL)
     #TODO: create a query here
+    for song in adjustedSongs:
+        response = requests.post(newEndpointURL, headers={"Authorization": authHeader, "Content-Type": "application/json", "Accept": "application/json"}, data={"uris": [song]})
+        print(type(response)) #TODO: FIRST add here
+        if response.status_code < 200 or response.status_code > 299:
+            # VERY IMPORTANT: You need to set a scope in order for songs to be added. Client credentials will not work
+            # for this authorization Also note, from this link,
+            # https://developer.spotify.com/documentation/web-api/concepts/playlists public playlists can not be
+            # collaborative and vice versa
+            error = response.json()
+            print(error)
+            continue
+        responseDict = response.json()
+        print(responseDict)
     print("Successfully added stuff to playlists")
     return response
 
@@ -69,11 +87,12 @@ def searchAndReturnSongIds(endpointURL, authHeader, songNames):
     # TODO: change this URL
     print("extracted songs")
     arrayOfSongIds = []
+    print("length of convertSongNames: ", len(convertedSongNames))
     for i in range(1, len(convertedSongNames)):
         newEndpointURL = endpointURL + "/search?q=" + convertedSongNames[i]
         response = requests.get(newEndpointURL, headers={"Authorization": authHeader})
-        time.sleep(1)
-        if response.status_code != 200:
+        # time.sleep(1)
+        if response.status_code < 200 or response.status_code > 299:
             error = "didn't get a successful response please check the request"
             print(error)
             continue
@@ -82,6 +101,7 @@ def searchAndReturnSongIds(endpointURL, authHeader, songNames):
         result = extractSongIdFromSearch(response)
         if result != -1:
             arrayOfSongIds.append(result)
+    print("successfully obtained array of songIds: ", arrayOfSongIds)
     return arrayOfSongIds
 
 def extractSongIdFromSearch(responseJson):
@@ -95,7 +115,7 @@ def extractSongIdFromSearch(responseJson):
     return songId
 def adjustSongURLAndGetList (songIDs):
     # get the song and add it to playlist
-    #TODO: This is the proper link https://developer.spotify.com/documentation/web-api/reference/add-tracks-to-playlist
+    #TODO FROM HERE: This is the proper link https://developer.spotify.com/documentation/web-api/reference/add-tracks-to-playlist
     urlSongs = []
     for song in songIDs:
         urlSong = "spotify:track:" + song
