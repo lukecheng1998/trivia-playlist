@@ -1,6 +1,6 @@
 import base64
 
-from flask import Flask, request, redirect, jsonify
+from flask import Flask, request, redirect
 import requests
 
 app = Flask(__name__)
