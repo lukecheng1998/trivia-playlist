@@ -12,8 +12,11 @@ def beginProcess(url):
     print(songArray)
     return songArray
 
-def getTokenFromSpotifyNew(authURL, clientId, client_secret, code, content_type_2, content_type, scope):
-    tokenResponse = requests.post(authURL, headers={"Content-Type": content_type_2, "Authorization": code})
+def getTokenFromSpotifyNew(authURL, code, content_type_2):
+    print("inside getting token obtaining token now")
+    tokenResponse = requests.post(authURL, headers={"Content-Type": content_type_2, "Authorization": "Basic $(echo -n '555395fa580f41ff939897aff379da60:98764b2630864555a86d119661a5736a' | base64)"}, data={'grant_type': "authorization_code", "code": code, "redirect_uri": "http://localhost:8080/callback"})
+    print("Token Response: ", tokenResponse)
+    return tokenResponse
 
 def getTokenFromSpotify(authURL, clientId, clientSecrets, grantType, contentType, scope):
     # make a request here, obtains the auth token that is needed to execute commands in the spotify env
@@ -41,7 +44,7 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     error = "Playlist does not exist, please create the playlist"
     return error
 
-def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authCodeHeader):
+def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authCode):
     # after getting the playlist we need to see if the playlist needs to be changed or if songs need to be added to it
     newEndpointURL = endpointURL + "/playlists/" + playlistId
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader}).json()
@@ -58,7 +61,7 @@ def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authC
     print("New Endpoint URL: " + newEndpointURL)
     #TODO: create a query here
     for song in adjustedSongs:
-        response = requests.post(newEndpointURL, headers={"Authorization": authHeader, "Content-Type": "application/json", "Accept": "application/json"}, data={"uris": [song]})
+        response = requests.post(newEndpointURL, headers={"Authorization": authCode, "Content-Type": "application/json", "Accept": "application/json"}, data={"uris": [song]})
         print(type(response)) #TODO: FIRST add here
         if response.status_code < 200 or response.status_code > 299:
             # VERY IMPORTANT: You need to set a scope in order for songs to be added. Client credentials will not work

@@ -1,5 +1,6 @@
 # This is a sample Python script.
 import getsongs
+import getTokenFromScript
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 # FIELDS
@@ -12,15 +13,18 @@ clientSecret = '98764b2630864555a86d119661a5736a'
 endpointURL = 'https://api.spotify.com/v1'
 username = '1256375693'
 scope = 'playlist-modify-public'
-auth_code = 'AQC2CdrM0guE7N7E2j8vsytdmRa7oQOB5GLmkqpMRo5qnYpRy6-TVuZgCsxBclZB_4OzeIJnp2I8QZhSAifMNwRl5x7_iJVBKlJbI1Yw4slHoICbSyfLGjXUjtMp0ydiJEnFT2CtHwZ-asPtMB2YYMfPY0sdSocFNKki5vmuk9zmK5RW9G2TW-9DKXcDy2yMcb9eD5Gvh8QOmg'
-content_type_2 = 'localhost:8080/callback'
+auth_code = 'AQC825eUf3qUJ1-AJZEBB8YObDE4BEqWabHBh0qPLlLjfurNdm6PQ4i7AqNq8ZFlIl2tgbLHkQyMoDG8O8ndMjmwqgbZMnY4aBc-_raG3fgsdTT8EwYkOcpj-20unNg15o4D_1WXr57UZXh0_3p5W3sHCuri5WZLf4lXTSt7I6gGgBPqMjzz7n0kZsdsLHRCeWlgXnGWeTOkUw'
+content_type_2 = 'application/x-www-form-urlencoded'
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     songNames = getsongs.beginProcess(url)
-    token = getsongs.getTokenFromSpotify(authURL, clientId, clientSecret, grantType, contentType, scope)
-    print("Token from spotify new: ", getsongs.getTokenFromSpotifyNew(authURL, clientId, clientSecret, auth_code, content_type_2, contentType, scope))
+    token = getTokenFromScript.get_token().stdout
+    if token.__contains__("error"):
+        print("Error in token ", token)
+    print("token obtained from script: ", token)
+    access_token = token["access_token"]
     playlistId = getsongs.getPlaylistFromId(endpointURL, username, token)
-    getsongs.updateOrModifyPlaylist(endpointURL, playlistId, token, songNames)
+    getsongs.updateOrModifyPlaylist(endpointURL, playlistId, token, songNames, access_token)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

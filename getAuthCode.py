@@ -21,33 +21,6 @@ def login():
 
 
 @app.route('/callback')
-# def callback():
-#     print(request.json)
-#     code = request.args.get('code')
-#     state = request.args.get('state')
-#     if state is None:
-#         return redirect('/#?error=state_mismatch')
-#     token_url = 'https://accounts.spotify.com/api/token'
-#     form_data = {
-#         'code': code,
-#         'redirect_uri': redirect_uri,
-#         'grant_type': 'authorization_code'
-#     }
-#     client_credentials = f'{client_id}:{client_secret}'
-#     encoded_credentials = base64.b64encode(client_credentials.encode()).decode()
-#
-#     headers = {
-#         'Content-Type': 'application/x-www-form-urlencoded',
-#         'Authorization': f'Basic {encoded_credentials}'
-#     }
-#
-#     response = requests.post(token_url, data=form_data, headers=headers)
-#
-#     if response.status_code == 200:
-#         token_info = response.json()
-#         return jsonify(token_info)
-#     else:
-#         return jsonify({'error': "Failed to fetch token", 'status': response.status_code})
 def callback():
     authorization_code = request.args.get('code')
     print(request.args.get('state'))
@@ -56,6 +29,10 @@ def callback():
     else:
         return "Authorization failed"
 
+@app.route("/callback-more")
+def callback_more():
+    print("this works")
 
 if __name__ == '__main__':
     app.run(port=8080)
+#auth-code:  AQA8fgNL5bkS1tSQvMfkRiWzOANvgmvO2cfbFccYuVT-psOKFJMmRhL6VwPm-bnWN_7JIRSKqHeqZioY6y7UtSvO6VGPl5xdtkpSD3pmb3y0n6Nd6eDooaZQeggZyZg6vPge6hGleAHDPh8X_aO_F8OLNgcO5r5EZttmScW2Jq6xea0rqT_AUFRoD4hk8Dz030g8HoFgfP1Kvw
