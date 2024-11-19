@@ -1,8 +1,9 @@
+import os
 import subprocess
 import base64
-client_id = "555395fa580f41ff939897aff379da60"
-client_secret = "98764b2630864555a86d119661a5736a"
-authorization_code = "AQB0hFCPe-17jbAOWOLg_0RzATtdwQtpPLJD_yxVWY5IvFEyQ1zabpGCBTiLLJcadMnIQLgaWS_qUOpR3DV6LtMpWCO9S5UtJ6GF3iyXjpU2QHqpDkMGRiP8Dx5av22X3c99cke2s9-01vOk_BAT_ITlEoS9CaU-9etj1N0Me-EXPf083E0m6I2jHTlw710rCzc-mRux_JHOsA"
+client_id = os.environ.get("client_id")
+client_secret = os.environ.get("client_secret")
+authorization_code = ""
 redirect_uri = "http://localhost:8080/callback"
 
 client_credentials = f"{client_id}:{client_secret}"

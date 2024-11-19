@@ -1,12 +1,13 @@
 from flask import Flask, request, redirect
 import requests
+import os
 
 app = Flask(__name__)
 scope = 'playlist-modify-public'
 redirect_uri = 'http://localhost:8080/callback'
 auth_url= 'https://accounts.spotify.com/authorize'
-client_id = '555395fa580f41ff939897aff379da60'
-client_secret = '98764b2630864555a86d119661a5736a'
+client_id = os.environ.get("client_id")
+client_secret = os.environ.get("client_secret")
 
 @app.route('/')
 def login():

@@ -44,7 +44,7 @@ def getPlaylistFromId(endpointURL, id, authHeader):
     error = "Playlist does not exist, please create the playlist"
     return error
 
-def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authCode):
+def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames):
     # after getting the playlist we need to see if the playlist needs to be changed or if songs need to be added to it
     newEndpointURL = endpointURL + "/playlists/" + playlistId
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader}).json()
@@ -61,7 +61,11 @@ def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames, authC
     print("New Endpoint URL: " + newEndpointURL)
     #TODO: create a query here
     for song in adjustedSongs:
-        response = requests.post(newEndpointURL, headers={"Authorization": authCode, "Content-Type": "application/json", "Accept": "application/json"}, data={"uris": [song]})
+        song_data = {
+            "uris": [song],
+            "position": 0
+        }
+        response = requests.post(newEndpointURL, headers={"Authorization": authHeader, "Content-Type": "application/json", "Accept": "application/json"}, json=song_data)
         print(type(response)) #TODO: FIRST add here
         if response.status_code < 200 or response.status_code > 299:
             # VERY IMPORTANT: You need to set a scope in order for songs to be added. Client credentials will not work
