@@ -1,6 +1,8 @@
 # This is a sample Python script.
 import getsongs
 import getTokenFromScript
+import remove_songs
+
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 # FIELDS
@@ -20,10 +22,6 @@ content_type_2 = 'application/x-www-form-urlencoded'
 if __name__ == '__main__':
     songNames = getsongs.beginProcess(url)
     token = getTokenFromScript.get_token().stdout
-    # if token.__contains__("error"):
-    #     print("Error in token ", token)
-    # print("token obtained from script: ", token)
-    # access_token = token["access_token"]
     access_token = "Bearer BQD_zkmZB6SgE9sn1UKS8_GDwKPX7yApN3j_jNyh15W_AQ_tOY-mx1yGma55Oa8D2u0K4FswQoPukbFORBev_A7qgpsrXvP8FpBc90uz9U5Iu0_dQ3_dPXOcrsMJBynvj2x-m8iiLbnJEb8pofo7NS3N1tWmoOG6fgWSuFzr2al3mhb-JK2VNwisrciOsZeR_UXxFYreD602npp2epZUz0ArGQ"
     playlistId = getsongs.getPlaylistFromId(endpointURL, username, access_token)
     getsongs.updateOrModifyPlaylist(endpointURL, playlistId, access_token, songNames)

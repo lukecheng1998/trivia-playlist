@@ -1,8 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-import time
-
+import remove_songs
 # This file will get the songs and convert to a json file
 # Make a GET request to the URL
 triviaPlaylist = "Trivia Playlist"
@@ -48,14 +47,17 @@ def updateOrModifyPlaylist(endpointURL, playlistId, authHeader, songNames):
     # after getting the playlist we need to see if the playlist needs to be changed or if songs need to be added to it
     newEndpointURL = endpointURL + "/playlists/" + playlistId
     response = requests.get(newEndpointURL, headers= {"Authorization": authHeader}).json()
+    if response.status_code != 200:
+        print(response)
+        return
     tracks = response["tracks"]
     if len(tracks["items"]) > 0:
         # delete the tracks and reset
         print("To be deleted")
     # search for song ids here
     searchedSongIds = searchAndReturnSongIds(endpointURL, authHeader, songNames)
-    #TODO: add songs here AND continue from here Luke C.
     adjustedSongs = adjustSongURLAndGetList(searchedSongIds)
+    remove_songs.remove_songs(endpointURL, authHeader, adjustedSongs)
     print(adjustedSongs)
     newEndpointURL = endpointURL + "/playlists/" + playlistId + "/tracks"
     print("New Endpoint URL: " + newEndpointURL)
@@ -148,6 +150,7 @@ def convertedSongNamesWithArtists(songName, artistName):
     artistName = artistName.replace("'", "%2527")
     retQuery = "track%253A" + songName + "artist%253A" + artistName
     return retQuery
+
 
 def convertArrayToJson(songArray):
     with open('output.json', 'w', encoding='utf-8') as outfile:
